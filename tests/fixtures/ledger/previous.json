@@ -1,5 +1,7 @@
 {
   "summary": {
+    "window_days": 90,
+    "generated_at": "2026-04-01T00:00:00+00:00",
     "total_cost_usd": 10,
     "total_value_usd": 20,
     "net_usd": 10,

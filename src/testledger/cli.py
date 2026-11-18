@@ -224,6 +224,18 @@ def _print_summary(s: dict) -> None:
     console.print(t)
 
 
+def _read_ledger_snapshot(path: Path) -> Snapshot:
+    try:
+        return Snapshot.read(path)
+    except UnicodeDecodeError as exc:
+        raise typer.BadParameter(f"Save {path} as UTF-8 JSON and retry.") from exc
+    except OSError as exc:
+        raise typer.BadParameter(f"Could not read {path}: {exc.strerror}") from exc
+    except ValidationError as exc:
+        problem = exc.errors(include_input=False)[0]["msg"]
+        raise typer.BadParameter(f"Invalid ledger at {path}: {problem}") from exc
+
+
 @app.command()
 def diff(
     old: Path = typer.Argument(..., exists=True, dir_okay=False, help="Previous ledger.json"),
@@ -232,11 +244,7 @@ def diff(
     json_output: bool = typer.Option(False, "--json", help="Print machine-readable JSON"),
 ) -> None:
     """Compare two saved ledger reports."""
-    try:
-        old_snapshot, new_snapshot = Snapshot.read(old), Snapshot.read(new)
-    except (OSError, ValidationError) as exc:
-        raise typer.BadParameter(f"Could not read both ledger.json files: {exc}") from exc
-    report = compare_ledgers(old_snapshot, new_snapshot)
+    report = compare_ledgers(_read_ledger_snapshot(old), _read_ledger_snapshot(new))
     if out is not None:
         if out.resolve() in {old.resolve(), new.resolve()}:
             raise typer.BadParameter("Choose an output path different from either ledger.json input.")

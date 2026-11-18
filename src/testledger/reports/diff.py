@@ -16,6 +16,8 @@ class SnapshotSummary(BaseModel):
     portfolio_roi: float | None
     regressions_caught: int
     verdicts: dict[str, int]
+    window_days: int | None = None
+    generated_at: str | None = None
 
 
 class SnapshotAccount(BaseModel):
@@ -31,7 +33,7 @@ class Snapshot(BaseModel):
 
     @classmethod
     def read(cls, path: Path) -> "Snapshot":
-        return cls.model_validate_json(path.read_text(encoding="utf-8"))
+        return cls.model_validate_json(path.read_text(encoding="utf-8-sig"))
 
 
 def _change(old: float | int | None, new: float | int | None) -> dict:
@@ -50,6 +52,11 @@ def _assumptions(values: dict) -> dict:
 def compare_ledgers(old: Snapshot, new: Snapshot) -> dict:
     metrics = ("total_cost_usd", "total_value_usd", "net_usd", "portfolio_roi", "regressions_caught")
     portfolio = {key: _change(getattr(old.summary, key), getattr(new.summary, key)) for key in metrics}
+    portfolio["generated_at"] = {
+        "old": old.summary.generated_at,
+        "new": new.summary.generated_at,
+        "delta": None,
+    }
     old_counts, new_counts = old.summary.verdicts, new.summary.verdicts
     verdict_names = {verdict.value for verdict in Verdict} | old_counts.keys() | new_counts.keys()
     verdicts = {key: _change(old_counts.get(key, 0), new_counts.get(key, 0)) for key in sorted(verdict_names)}
@@ -74,6 +81,9 @@ def compare_ledgers(old: Snapshot, new: Snapshot) -> dict:
         for key in sorted(old_rates.keys() | new_rates.keys())
         if old_rates.get(key, missing) != new_rates.get(key, missing)
     }
+    old_days, new_days = old.summary.window_days, new.summary.window_days
+    if old_days != new_days:
+        assumptions["window_days"] = {"old": old_days, "new": new_days}
     return {
         "portfolio": portfolio,
         "verdicts": verdicts,
@@ -82,6 +92,7 @@ def compare_ledgers(old: Snapshot, new: Snapshot) -> dict:
         "verdict_changes": verdict_changes,
         "net_changes": net_changes[:10],
         "assumptions": assumptions,
+        "window_lengths_differ": old_days is not None and new_days is not None and old_days != new_days,
     }
 
 
@@ -118,8 +129,11 @@ def diff_tables(report: dict) -> Iterator[tuple[str, tuple[str, ...], list[tuple
             for row in report["net_changes"]
         ],
     )
+    assumptions_title = "Changed assumptions"
+    if report["window_lengths_differ"]:
+        assumptions_title += " (window lengths differ)"
     yield (
-        "Changed assumptions",
+        assumptions_title,
         ("Assumption", "Previous", "Current"),
         [(name, _display(row["old"]), _display(row["new"])) for name, row in report["assumptions"].items()],
     )

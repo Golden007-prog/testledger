@@ -53,7 +53,8 @@ testledger diff q3/ledger.json q4/ledger.json --json
 
 The comparison shows portfolio totals and verdict counts, tests added or removed,
 verdict changes, and the ten largest net changes among tests in both ledgers.
-Review the changed rates and thresholds before interpreting differences in cost or value.
+It shows each report's generation timestamp and flags mismatched window lengths.
+Review changes in the window length, rates, and thresholds before comparing cost or value.
 
 ### Local report folder convention
 TestLedger needs to know which CI runs re-executed the **same commit** — that is how flakiness is detected without any test-framework changes. For local folders, name each run directory:

@@ -1,5 +1,7 @@
 {
   "summary": {
+    "window_days": 60,
+    "generated_at": "2026-06-01T00:00:00+00:00",
     "total_cost_usd": 20,
     "total_value_usd": 36,
     "net_usd": 16,
