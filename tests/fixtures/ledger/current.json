@@ -1,0 +1,16 @@
+{
+  "summary": {
+    "total_cost_usd": 20,
+    "total_value_usd": 36,
+    "net_usd": 16,
+    "portfolio_roi": 0.8,
+    "regressions_caught": 3,
+    "verdicts": {"asset": 2, "hold": 1}
+  },
+  "assumptions": {"ci_minute_usd": 0.2, "thresholds": {"min_executions_for_verdict": 10}},
+  "accounts": [
+    {"test_id": "suite::improves", "verdict": "asset", "net_usd": 20},
+    {"test_id": "suite::added", "verdict": "asset", "net_usd": -5},
+    {"test_id": "suite::declines", "verdict": "hold", "net_usd": 1}
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "summary": {
+    "total_cost_usd": 10,
+    "total_value_usd": 20,
+    "net_usd": 10,
+    "portfolio_roi": 1,
+    "regressions_caught": 1,
+    "verdicts": {"fix": 1, "retire": 1, "asset": 1}
+  },
+  "assumptions": {"ci_minute_usd": 0.1, "thresholds": {"min_executions_for_verdict": 8}},
+  "accounts": [
+    {"test_id": "suite::improves", "verdict": "fix", "net_usd": 7},
+    {"test_id": "suite::removed", "verdict": "retire", "net_usd": -2},
+    {"test_id": "suite::declines", "verdict": "asset", "net_usd": 5}
+  ]
+}

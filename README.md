@@ -44,6 +44,17 @@ testledger init                    # writes testledger.yml with documented defau
 testledger analyze --config testledger.yml --reports path/to/ci-reports --out testledger-out
 ```
 
+### Compare two saved ledgers
+
+```bash
+testledger diff q3/ledger.json q4/ledger.json --out diff.md
+testledger diff q3/ledger.json q4/ledger.json --json
+```
+
+The comparison shows portfolio totals and verdict counts, tests added or removed,
+verdict changes, and the ten largest net changes among tests in both ledgers.
+Review the changed rates and thresholds before interpreting differences in cost or value.
+
 ### Local report folder convention
 TestLedger needs to know which CI runs re-executed the **same commit** — that is how flakiness is detected without any test-framework changes. For local folders, name each run directory:
 
@@ -164,7 +175,7 @@ ruff check src tests
 ## Roadmap
 - [ ] GitLab CI and Azure DevOps ingesters
 - [ ] Code-ownership join (CODEOWNERS) so the memo is grouped by team
-- [ ] Quarter-over-quarter diff (`testledger diff q3.json q4.json`)
+- [x] Quarter-over-quarter diff (`testledger diff q3.json q4.json`)
 - [ ] Optional LLM narrative for the memo (opt-in, local or API)
 - [ ] Web dashboard reading `ledger.json`
 
